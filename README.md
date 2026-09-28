@@ -8,3 +8,11 @@ Documentation and forums are the primary source of research, with minimal AI usa
 
 Ideally, by the end of the project, I will be able to sit down and recreate my project without internet access whatsoever.
 To achieve this, I will be required to deeply understand C, unix sockets, and networking, along with HTTP requests and response formats.
+
+## Current Progress:
+- Boilerplate Client and Server compile and run
+- Server responds with basic HTTP 200
+
+## Next Steps:
+- Learn to parse requests (not just print it back out)
+- Respond differently to different requests
