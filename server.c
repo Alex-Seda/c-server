@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #define PORT 8080
+
 int main(int argc, char const* argv[])
 {
     int server_fd, new_socket;
@@ -13,7 +14,7 @@ int main(int argc, char const* argv[])
     int opt = 1;
     socklen_t addrlen = sizeof(address);
     char buffer[1024] = { 0 };
-    char* response = "HTTP/3 200\nHello from Server";
+    char* response;
 
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -65,4 +66,9 @@ int main(int argc, char const* argv[])
     // closing the listening socket
     close(server_fd);
     return 0;
+}
+
+
+char* parseRequest(char* request){
+    return "HTTP/1.1 200\n\n<!DOCTYPE html>\n<html lang=\"en\">\nHello from Server\n</html>";
 }
