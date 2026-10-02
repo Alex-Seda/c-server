@@ -1,10 +1,4 @@
-#include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#define PORT 8080
+#include "server.h"
 
 int main(int argc, char const* argv[])
 {
@@ -45,7 +39,7 @@ int main(int argc, char const* argv[])
         exit(EXIT_FAILURE);
     }
 
-    for(int i=0; i<3; i++){
+    for(int i=0; i<1; i++){
         new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen);
 
 	    // subtract 1 for the null
@@ -53,6 +47,8 @@ int main(int argc, char const* argv[])
 	    valread = read(new_socket, buffer, 1024 - 1);
         
         printf("Request received:\n%s\n", buffer);
+
+        response = parseRequest(buffer);
 	    
         // Send Server Response
         send(new_socket, response, strlen(response), 0);
@@ -70,5 +66,5 @@ int main(int argc, char const* argv[])
 
 
 char* parseRequest(char* request){
-    return "HTTP/1.1 200\n\n<!DOCTYPE html>\n<html lang=\"en\">\nHello from Server\n</html>";
+    return "HTTP/1.1 200\n\n<!DOCTYPE html>\n<html lang=\"en\">\n<h1>Hello from Server</h1>\n</html>";
 }
