@@ -10,8 +10,9 @@ Ideally, by the end of the project, I will be able to sit down and recreate my p
 To achieve this, I will be required to deeply understand C, unix sockets, and networking, along with HTTP requests and response formats.
 
 ## Current Progress:
+- Makefile is used to compile and run the server
 - Boilerplate Client and Server compile and run
-- Server responds with basic HTTP 200
+- Server responds with dynamically contructed response based on html file
 
 ## Next Steps:
 - Learn to parse requests (not just print it back out)
