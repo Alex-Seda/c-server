@@ -2,13 +2,13 @@
 
 int main(int argc, char const *argv[])
 {
-    int server_fd, new_socket;
-    ssize_t valread;
+    int server_fd, new_socket; // Initialize variables for server file descriptor and new socket file descriptor
+    ssize_t valread; // Initialize variable for read() return value when reading the socket into the buffer
     struct sockaddr_in address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);
-    char buffer[1024] = { 0 };
-    char *response;
+    char buffer[1024] = { 0 }; // Initialize buffer for reading the socket
+    char *response; // Initialize variable for the server response
 
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -23,9 +23,9 @@ int main(int argc, char const *argv[])
         perror("setsockopt");
         exit(EXIT_FAILURE);
     }
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    address.sin_family = AF_INET; // Use the IPv4 address family
+    address.sin_addr.s_addr = INADDR_ANY; // Use any IPv4 address available (i.e. localhost, 127.0.0.1, 0.0.0.0, or any public/private device IP)
+    address.sin_port = htons(PORT); // Use the defined port constant (change from little endian (local device convention) to big endian (networking convention))
 
     // Forcefully attaching socket to the port 8080
     if (bind(server_fd, (struct sockaddr*)&address,
@@ -40,29 +40,51 @@ int main(int argc, char const *argv[])
     }
 
     for(int i=0; i<1; i++){
+        // TODO: Add security tightening and error checking/handling below
+
+
+        /*
+         * The server will wait here until there is a connection request on the socket
+         *
+         * When there is a request, it will make a new socket for that connection so that the listening socket can continue listening
+         *
+         * On a real server, you would likely multithread this portion for concurrent request handling
+         */
         new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen);
 
-	    // subtract 1 for the null
-	    // terminator at the end
-	    valread = read(new_socket, buffer, 1024 - 1); // valread returns the number of bytes read
+        /*
+         * Read up to 1023 bytes of information from the socket into the buffer
+         *
+         * We subtract 1 for the null terminator at the end of the buffer
+         *
+         * read() returns the number of bytes it read, and we set valread to that number
+         */
+	    valread = read(new_socket, buffer, 1024 - 1);
 
+        // Explicitly set the last character to the null terminator
+        buffer[valread] = '\0';
+
+        // Print the request to terminal
         printf("Request received:\n%s\n", buffer);
 
+        // Get the response based on the request
         response = parseRequest(buffer);
 
-        // Send Server Response
+        // Send server response on the socket to the requestor
         send(new_socket, response, strlen(response), 0);
-	    printf("Server Response Sent\n\n\n");
+	    
+        // Print server send success message
+        printf("Server Response Sent\n\n\n");
 
         // Free the memory that was allocated for the response in "parseRequest"
         free(response);
 
-	    // closing the connected socket
+	    // Close the connected socket
 	    close(new_socket);
     }
 
 
-    // Closing the listening socket
+    // Close the listening socket
     close(server_fd);
 
     // Return Success code
@@ -71,9 +93,10 @@ int main(int argc, char const *argv[])
 
 
 char *parseRequest(char *request){
-    // Implementation of request handling will be placed here at a later time
+    // TODO: Implement dynamic request parsing
 
 
+    // TODO: Add security tightening and error checking/handling below
     /*
      * Define the HTTP header
      *
