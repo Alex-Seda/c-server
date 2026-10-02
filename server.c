@@ -55,9 +55,9 @@ int main(int argc, char const *argv[])
      *  The last argument is the size of the memory stored at the location passed in the previous argument "sizeof(opt)"
      *  This lets the function know what size to expect the data to be
      */
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0) { // If setsocketopt() returns -1, then it failed
+        perror("setsockopt"); // Print 'setsockopt' and then the error in errno from the failed setsocketopt() call
+        exit(EXIT_FAILURE); // Exit program execution with a failure code
     }
 
 
@@ -76,16 +76,40 @@ int main(int argc, char const *argv[])
      *
      * When a socket is created, it exists with the specification that it is intended for a certain namespace (AF_INET)
      * However, it does not actually have an address assigned to it until we bind an address to the socket
+     *
+     * bind() returns 0 on success and -1 on failure
+     *
+     * The socket to be bound to is server_fd, the socket we opened earlier
+     *
+     * The address that we are assigning to that socket is the address stored at our address variable's memory location
+     *
+     * Finally, we tell bind() what size of an sockaddr struct to expect so it knows how much information to expect
      */
-    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
-    }
-    if (listen(server_fd, 3) < 0) {
-        perror("listen");
-        exit(EXIT_FAILURE);
+    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) { // If bind() returns -1, then it failed
+        perror("bind failed"); // Print 'bind failed' and then the error in errno from the failed bind() call
+        exit(EXIT_FAILURE); // Exit program execution with a failure code
     }
 
+    /*
+     * DESIGNATE SOCKET AS A LISTENING SOCKET
+     *
+     * listen() returns 0 on success and -1 on failure
+     *
+     * This marks the socket server_fd as a listening socket with an available backlog of 3
+     * The backlog argument defines the maximum length that the queue of pending connections may reach before the server refuses connections
+     */
+    if (listen(server_fd, 3) < 0) { // If listen() returns -1, then it failed
+        perror("listen"); // Print 'listen' and then the error in errno from the failed listen() call
+        exit(EXIT_FAILURE); // Exit program execution with a failure code
+    }
+
+
+    /*
+     * CONNECTION LOOP
+     *
+     * This loop waits for a connection request, makes a new socket for it, handles the request, responds to the requestor, then closes the connection
+     * At the moment, there is no concurrency, and the server only accepts one request then exits its loop
+     */
     for(int i=0; i<1; i++){
         // TODO: Add security tightening and error checking/handling below
 
