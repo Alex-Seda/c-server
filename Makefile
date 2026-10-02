@@ -1,8 +1,13 @@
 # Makefile for compiling and running the server
 
+# Declare phony targets
+.PHONY: run server clean
+
+# Compiler and flags
 CC := gcc
 CFLAGS := -Wall
 
+# Command definitions
 run: server
 	./server
 
