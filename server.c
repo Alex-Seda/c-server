@@ -1,6 +1,6 @@
 #include "server.h"
 
-int main(int argc, char const* argv[])
+int main(int argc, char const *argv[])
 {
     int server_fd, new_socket;
     ssize_t valread;
@@ -8,7 +8,7 @@ int main(int argc, char const* argv[])
     int opt = 1;
     socklen_t addrlen = sizeof(address);
     char buffer[1024] = { 0 };
-    char* response;
+    char *response;
 
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -45,30 +45,32 @@ int main(int argc, char const* argv[])
 	    // subtract 1 for the null
 	    // terminator at the end
 	    valread = read(new_socket, buffer, 1024 - 1); // valread returns the number of bytes read
-        
+
         printf("Request received:\n%s\n", buffer);
 
         response = parseRequest(buffer);
-	    
+
         // Send Server Response
         send(new_socket, response, strlen(response), 0);
 	    printf("Server Response Sent\n\n\n");
 
         // Free the memory that was allocated for the response in "parseRequest"
         free(response);
-	
+
 	    // closing the connected socket
 	    close(new_socket);
     }
-  
-  
-    // closing the listening socket
+
+
+    // Closing the listening socket
     close(server_fd);
-    return 0;
+
+    // Return Success code
+    return EXIT_SUCCESS;
 }
 
 
-char* parseRequest(char* request){
+char *parseRequest(char *request){
     // Implementation of request handling will be placed here at a later time
 
 

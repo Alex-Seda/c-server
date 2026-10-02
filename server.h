@@ -6,4 +6,4 @@
 #include <unistd.h>
 #define PORT 8080
 
-char* parseRequest(char* request);
+char* parseRequest(char *request);
