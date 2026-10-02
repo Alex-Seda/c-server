@@ -44,7 +44,7 @@ int main(int argc, char const* argv[])
 
 	    // subtract 1 for the null
 	    // terminator at the end
-	    valread = read(new_socket, buffer, 1024 - 1);
+	    valread = read(new_socket, buffer, 1024 - 1); // valread returns the number of bytes read
         
         printf("Request received:\n%s\n", buffer);
 
@@ -53,6 +53,9 @@ int main(int argc, char const* argv[])
         // Send Server Response
         send(new_socket, response, strlen(response), 0);
 	    printf("Server Response Sent\n\n\n");
+
+        // Free the memory that was allocated for the response in "parseRequest"
+        free(response);
 	
 	    // closing the connected socket
 	    close(new_socket);
@@ -66,5 +69,55 @@ int main(int argc, char const* argv[])
 
 
 char* parseRequest(char* request){
-    return "HTTP/1.1 200\n\n<!DOCTYPE html>\n<html lang=\"en\">\n<h1>Hello from Server</h1>\n</html>";
+    // Implementation of request handling will be placed here at a later time
+
+
+    /*
+     * Define the HTTP header
+     *
+     * The simplest HTTP header the HTTP version and the status code of the response
+     *
+     * 200 means OK (or a successful response)
+     *
+     * After the status, an empty new line is left to signify the start of the HTTP response body
+     */
+    char *header = "HTTP/1.1 200\n\n";
+
+
+    /*
+     * Get the HTML contents to return to the requestor
+     */
+    FILE *file = fopen("public/index.html", "rb"); // Open the index.html file for reading
+    fseek(file, 0, SEEK_END); // Set the file pointer position to the end of the file with an initial offset of 0
+    long fsize = ftell(file); // Get the current file position relative to the end of the file (this gets the file length)
+    fseek(file, 0, SEEK_SET); // Set the file pointer position to the beginning of the file to prepare for reading (also with an initial offset of 0)
+
+    char *body = malloc(fsize + 1); // Allocate enough memory for the file size plus the null terminator
+
+    /*
+     * Read into body (the character buffer where we will store the page to return to the requestor)
+     * fsize items of data (this number is equal to the number of bytes in our file),
+     * where the data is size 1 (1 byte),
+     * from file (the page template)
+     */
+    fread(body, fsize, 1, file);
+
+    fclose(file); // Close the file descriptor
+    body[fsize] = '\0'; // Set the last character of the buffer to the null terminator
+
+    /*
+     * Now we combine the header and body into one single response
+     * To do this, we must reserve a larger chunk of memory:
+     *   strlen(header): Length of the header string
+     *   strlen(body): Length of the body string
+     *   1: Space for the null terminating character
+     */
+    char *response = malloc(strlen(header)+strlen(body)+1);
+
+    strcpy(response, header); // Copy the header into the beginning of the response
+    strncat(response, body, strlen(body)); // Copy the body into the rest of the response, specifying to only copy bytes equal to the body's length
+
+    free(body); // Since we have copied body now, we can free the memory we allocated
+
+    return response; // Return the full response
 }
