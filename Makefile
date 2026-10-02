@@ -1,7 +1,10 @@
 # Makefile for compiling and running the server
 
-CC = gcc
-CFLAGS = -Wall
+CC := gcc
+CFLAGS := -Wall
+
+run: server
+	./server
 
 server: server.o
 	$(CC) $(CFLAGS) -o server server.o

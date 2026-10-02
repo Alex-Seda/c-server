@@ -2,3 +2,6 @@
 # Ignore executables
 client
 server
+
+# Ignore any object files
+*.o
