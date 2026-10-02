@@ -59,11 +59,24 @@ int main(int argc, char const *argv[])
         perror("setsockopt");
         exit(EXIT_FAILURE);
     }
+
+
+    /*
+     * SET ADDRESS SPECIFICATIONS
+     *
+     * This prepares the address struct to be attached to the socket from earlier
+     * This is how other programs will find the socket
+     */
     address.sin_family = AF_INET; // Use the IPv4 address family
-    address.sin_addr.s_addr = INADDR_ANY; // Use any IPv4 address available (i.e. localhost, 127.0.0.1, 0.0.0.0, or any public/private device IP)
+    address.sin_addr.s_addr = INADDR_ANY; // Use any host IPv4 address available (i.e. localhost, 127.0.0.1, 0.0.0.0, or any public/private device IP)
     address.sin_port = htons(PORT); // Use the defined port constant (change from little endian (local device convention) to big endian (networking convention))
 
-    // Forcefully attaching socket to the port 8080
+    /*
+     * BIND THE ADDRESS TO THE SOCKET
+     *
+     * When a socket is created, it exists with the specification that it is intended for a certain namespace (AF_INET)
+     * However, it does not actually have an address assigned to it until we bind an address to the socket
+     */
     if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
         perror("bind failed");
         exit(EXIT_FAILURE);
