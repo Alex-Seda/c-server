@@ -10,16 +10,52 @@ int main(int argc, char const *argv[])
     char buffer[1024] = { 0 }; // Initialize buffer for reading the socket
     char *response; // Initialize variable for the server response
 
-    // Creating socket file descriptor
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("socket failed");
-        exit(EXIT_FAILURE);
+
+    /*
+     * CREATE THE LISTENING SOCKET
+     *
+     * socket() returns the file descriptor of the new socket on success
+     * On failure, it returns -1
+     *
+     * The domain is AF_INET, which means that this socket will transmit with IPv4 addresses
+     *
+     * The type is set to SOCK_STREAM, which means it will be used to transmit sequenced, reliable, two-way byte streams
+     *
+     * The protocol is set to 0
+     * There is usually only one protocol per communication domain, but if there are multiple, then this must be specified
+     * 0 is the default
+     */
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) { // If socket() returns -1, then the socket creation failed
+        perror("socket failed"); // Print 'socket failed' and then the error in errno from the failed socket() call
+        exit(EXIT_FAILURE); // Exit program execution with a failure code
     }
 
-    // Forcefully attaching socket to the port 8080
-    if (setsockopt(server_fd, SOL_SOCKET,
-                   SO_REUSEADDR | SO_REUSEPORT, &opt,
-                   sizeof(opt))) {
+    /*
+     * SET SOCKET OPTIONS
+     *
+     * setsockopt() returns 0 on success and -1 on failure
+     *
+     * The socket to be changed is server_fd, the one we just created
+     *
+     * The level is SOL_SOCKET, which sets these options at the socket level
+     *
+     * The options we are going to change are:
+     *   - SO_REUSEADDR
+     *     - When TCP connections handshake, the OS may not consider the connection closed after the last ACK packet
+     *     - Usually there is a TIME WAIT until it is considered closed, and the OS will not normally allow multiple connections to the same IP address
+     *     - In this situation, further connections to the address may be blocked until the current connection is considered closed
+     *     - When we set this option to true, it tells the OS to let multiple connections to have the same address, avoiding the denial of service
+     *   - SO_REUSEPORT
+     *     - This option is similar to reuseaddr, but more restrictive
+     *     - For a deeper explanation, see the direct documentation or https://stackoverflow.com/questions/14388706/how-do-so-reuseaddr-and-so-reuseport-differ
+     *
+     *  The option is set to the value stored at the memory address for opt, which is 1 in our case
+     *  This sets them to True
+     *
+     *  The last argument is the size of the memory stored at the location passed in the previous argument "sizeof(opt)"
+     *  This lets the function know what size to expect the data to be
+     */
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
         perror("setsockopt");
         exit(EXIT_FAILURE);
     }
@@ -28,9 +64,7 @@ int main(int argc, char const *argv[])
     address.sin_port = htons(PORT); // Use the defined port constant (change from little endian (local device convention) to big endian (networking convention))
 
     // Forcefully attaching socket to the port 8080
-    if (bind(server_fd, (struct sockaddr*)&address,
-             sizeof(address))
-        < 0) {
+    if (bind(server_fd, (struct sockaddr*)&address, sizeof(address)) < 0) {
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
@@ -44,6 +78,8 @@ int main(int argc, char const *argv[])
 
 
         /*
+         * CREATE NEW SOCKET FOR COMMUNICATION
+         *
          * The server will wait here until there is a connection request on the socket
          *
          * When there is a request, it will make a new socket for that connection so that the listening socket can continue listening
@@ -53,6 +89,8 @@ int main(int argc, char const *argv[])
         new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen);
 
         /*
+         * READ BYTE STREAM
+         *
          * Read up to 1023 bytes of information from the socket into the buffer
          *
          * We subtract 1 for the null terminator at the end of the buffer
@@ -60,6 +98,14 @@ int main(int argc, char const *argv[])
          * read() returns the number of bytes it read, and we set valread to that number
          */
 	    valread = read(new_socket, buffer, 1024 - 1);
+
+
+        /*
+         * This optional line prints the number of bytes read
+         * This is useful when debugging or if you would like to tailor the buffer to take up minimal space while being large enough to take requests
+         */
+        // printf("%zd bytes read\n",valread);
+
 
         // Explicitly set the last character to the null terminator
         buffer[valread] = '\0';
@@ -98,7 +144,7 @@ char *parseRequest(char *request){
 
     // TODO: Add security tightening and error checking/handling below
     /*
-     * Define the HTTP header
+     * DEFINE THE HTTP HEADER
      *
      * The simplest HTTP header the HTTP version and the status code of the response
      *
@@ -120,6 +166,8 @@ char *parseRequest(char *request){
     char *body = malloc(fsize + 1); // Allocate enough memory for the file size plus the null terminator
 
     /*
+     * READ HTML TEMPLATE
+     *
      * Read into body (the character buffer where we will store the page to return to the requestor)
      * fsize items of data (this number is equal to the number of bytes in our file),
      * where the data is size 1 (1 byte),
@@ -131,6 +179,8 @@ char *parseRequest(char *request){
     body[fsize] = '\0'; // Set the last character of the buffer to the null terminator
 
     /*
+     * COMBINE HEADER AND BODY FOR HTTP RESPONSE
+     *
      * Now we combine the header and body into one single response
      * To do this, we must reserve a larger chunk of memory:
      *   strlen(header): Length of the header string
