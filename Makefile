@@ -7,16 +7,27 @@
 CC := gcc
 CFLAGS := -Wall
 
+SERVICES := $(wildcard services/*.c)
+
+SOURCES = server.c $(SERVICES)
+
+OBJECTS = $(SOURCES:.c=.o)
+
+TARGET = server
+
 # Command definitions
-run: server
-	./server
+run: $(TARGET)
+	./$(TARGET)
 
-server: server.o
-	$(CC) $(CFLAGS) -o server server.o
+all: $(TARGET)
 
-server.o: server.c
-	$(CC) $(CFLAGS) -c server.c
+$(TARGET): $(OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $^
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f server server.o
+	rm -f $(TARGET) $(OBJECTS)
+	find . -name "*.o" -delete
 

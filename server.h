@@ -1,3 +1,4 @@
+// Libraries and Definitions for server.c
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h> 
@@ -5,5 +6,3 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #define PORT 8080
-
-char* parseRequest(char *request);
