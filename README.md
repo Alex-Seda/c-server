@@ -17,3 +17,4 @@ To achieve this, I will be required to deeply understand C, unix sockets, and ne
 ## Next Steps:
 - Learn to parse requests (not just print it back out)
 - Respond differently to different requests
+- Security tighten existing code (prevent open/read race conditions with files, inspect other code)
