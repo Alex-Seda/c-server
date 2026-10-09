@@ -69,3 +69,8 @@ char *parseRequest(char *request){
 
     return response; // Return the full response
 }
+
+struct HeaderFields decodeHeader(char* request){
+    struct HeaderFields header; // Initialize a struct to return
+
+}
