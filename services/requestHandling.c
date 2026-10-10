@@ -71,6 +71,7 @@ char *parseRequest(char *request){
 }
 
 struct HeaderFields decodeHeader(char* request){
-    struct HeaderFields header; // Initialize a struct to return
+    struct HeaderFields header = HeaderFields_defaultSettings; // Initialize a default HeaderFields struct to return
 
+    char* line[50];
 }
