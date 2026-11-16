@@ -1,6 +1,6 @@
 #include "requestHandling.h"
 
-char *parseRequest(char *request){
+char *parseRequest(char* request){
     // TODO: Implement dynamic request parsing
     /*
      * Decode request fields - possibly make a struct for this
@@ -14,6 +14,8 @@ char *parseRequest(char *request){
      *  - Return 404 if routing table returns nothing
      */
 
+    struct HeaderFields inHeader = decodeHeader(request);
+
 
     // TODO: Add security tightening and error checking/handling below
     /*
@@ -25,7 +27,7 @@ char *parseRequest(char *request){
      *
      * After the status, an empty new line is left to signify the start of the HTTP response body
      */
-    char *header = "HTTP/1.1 200\n\n";
+    char *outHeader = "HTTP/1.1 200\n\n";
 
 
     /*
@@ -60,9 +62,9 @@ char *parseRequest(char *request){
      *   strlen(body): Length of the body string
      *   1: Space for the null terminating character
      */
-    char *response = malloc(strlen(header)+strlen(body)+1);
+    char *response = malloc(strlen(outHeader)+strlen(body)+1);
 
-    strcpy(response, header); // Copy the header into the beginning of the response
+    strcpy(response, outHeader); // Copy the header into the beginning of the response
     strncat(response, body, strlen(body)); // Copy the body into the rest of the response, specifying to only copy bytes equal to the body's length
 
     free(body); // Since we have copied body now, we can free the memory we allocated
