@@ -75,7 +75,19 @@ char *parseRequest(char* request){
 struct HeaderFields decodeHeader(char* request){
     struct HeaderFields header = {false, "", "/", false};
 
-    char* line[50];
+    int i=0;
+    char line[50];
+
+    // Get Request type
+    while(i<7){
+        if(request[i] == ' ') break;
+        line[i] = request[i];
+        i++;
+    }
+    line[i] = '\0';
+
+    // Remove this. This is for ensuring correct parsing during development
+    printf("%s",line);
 
     return header;
 }
