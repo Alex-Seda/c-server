@@ -58,6 +58,8 @@ char *parseRequest(char* request){
      * Read file at the parsed file path from above
      */
     // TODO: Return 404 on failed file open
+    if(fopen(pageName, "rb") == nullptr){ return "404 error";}
+    else{
     FILE *file = fopen(pageName, "rb"); // Open the index.html file for reading
     fseek(file, 0, SEEK_END); // Set the file pointer position to the end of the file with an initial offset of 0
     long fsize = ftell(file); // Get the current file position relative to the end of the file (this gets the file length)
@@ -104,5 +106,6 @@ char *parseRequest(char* request){
     free(body); // Since we have copied body now, we can free the memory we allocated
 
     return response; // Return the full response
+    }
 }
 

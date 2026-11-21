@@ -111,7 +111,7 @@ int main(int argc, char const *argv[])
      * This loop waits for a connection request, makes a new socket for it, handles the request, responds to the requestor, then closes the connection
      * At the moment, there is no concurrency, and the server only accepts one request then exits its loop
      */
-    for(int i=0; i<1; i++){
+    while(true){
         // TODO: Add security tightening and error checking/handling below
 
 
