@@ -1,9 +1,10 @@
 #include "parseRequest.h"
 
 char *parseRequest(char* request){
-    // TODO: Implement dynamic request parsing
     /*
-     * Decode request fields - possibly make a struct for this
+     * Decode request fields into "HeaderFields" struct
+     *
+     * TODO:
      *
      * Middleware - logging, rate-limiting?, authentication?
      *  - Return errors as the HTTP Response if the request is invalid
@@ -17,7 +18,6 @@ char *parseRequest(char* request){
     struct HeaderFields inHeader = decodeHeader(request);
 
 
-    // TODO: Add security tightening and error checking/handling below
     /*
      * DEFINE THE HTTP HEADER
      *
@@ -31,9 +31,34 @@ char *parseRequest(char* request){
 
 
     /*
+     *
      * Get the HTML contents to return to the requestor
+     *
      */
-    FILE *file = fopen("public/index.html", "rb"); // Open the index.html file for reading
+
+
+    /*
+     * Find file name that corresponds to the requested page
+     */
+    printf("\n\ninHeader Page: %s\n\n", inHeader.page);
+    int pageNameSize = strlen(inHeader.page);
+    char *pageName = malloc(pageNameSize+1);
+    strncpy(pageName,"public",6);
+
+    // Append the page that was requested to the pageName string (direct "/" to "index.html")
+    if(pageNameSize == 1) strncat(pageName,"/index.html",11); // TODO: Improve this matching logic to only take "/"
+    else{
+        strncat(pageName,inHeader.page,pageNameSize);
+        strncat(pageName,".html",6);
+    }
+    //printf("\n\nRequesting Page with Filename: %s\n\n",pageName);
+
+
+    /*
+     * Read file at the parsed file path from above
+     */
+    // TODO: Return 404 on failed file open
+    FILE *file = fopen(pageName, "rb"); // Open the index.html file for reading
     fseek(file, 0, SEEK_END); // Set the file pointer position to the end of the file with an initial offset of 0
     long fsize = ftell(file); // Get the current file position relative to the end of the file (this gets the file length)
     fseek(file, 0, SEEK_SET); // Set the file pointer position to the beginning of the file to prepare for reading (also with an initial offset of 0)
@@ -62,15 +87,22 @@ char *parseRequest(char* request){
      *   strlen(body): Length of the body string
      *   1: Space for the null terminating character
      */
+
     char *response = malloc(strlen(outHeader)+strlen(body)+1);
 
-    strcpy(response, outHeader); // Copy the header into the beginning of the response
-    strncat(response, body, strlen(body)); // Copy the body into the rest of the response, specifying to only copy bytes equal to the body's length
+    // Copy the header into the beginning of the response
+    strcpy(response, outHeader);
+
+    /* Copy the body into the rest of the response, specifying to only copy bytes equal to the body's length
+     * NOTES: 
+     *  - strncat() null terminates any space after the input string
+     *  - We allocated enough space for one character more than the body length
+     *  - Therefore, this function will null terminate our response string for us
+     */
+    strncat(response, body, strlen(body));
 
     free(body); // Since we have copied body now, we can free the memory we allocated
 
     return response; // Return the full response
 }
-
-
 
