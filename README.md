@@ -36,8 +36,6 @@ After setting up all necessary variables and files, the server runs the followin
 │   ├─ parseRequest.c					(Logic called by main loop to take a request, parse through the header, determine response, and generate response)
 │   └─ parseRequest.h
 │
-├─ client.c						    (Test code for sending a request without a browser)
-│
 ├─ Makefile							(Definitions for make commands, i.e. "make run" and "make clean")
 │
 ├─ README.md						(Project Documentation)
