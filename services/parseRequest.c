@@ -61,9 +61,9 @@ char *parseRequest(char* request){
     FILE *file = fopen(pageName, "rb"); // Open the index.html file for reading
     if(file == NULL){
         char* outHeader = "HTTP/1.1 404\n\n";
-        char* body = "<!DOCTYPE html><html><main><h1>404 - Page Not Found</h1><p>We're sorry, we could not find the page you are looking for.</p><p>Please return home to find links to other pages!</p><a href=\"/about\">Go Home</a></main></html>";
-        char* response = malloc(strlen(outHeader) + strlen(body));
-        strncat(response,outHeader,strlen(outHeader));
+        char* body = "<!DOCTYPE html><html><main><h1>404 - Page Not Found</h1><p>We're sorry, we could not find the page you are looking for.</p><a href=\"/\">Go Home</a></main></html>";
+        char* response = malloc(strlen(outHeader) + strlen(body) + 1);
+        strcpy(response,outHeader);
         strncat(response,body,strlen(body));
         return response;
     }
