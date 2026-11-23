@@ -43,7 +43,7 @@ char *parseRequest(char* request){
     // TODO: Sanitize requested page input
     printf("\n\ninHeader Page: %s\n\n", inHeader.page);
     int pageNameSize = strlen(inHeader.page);
-    char *pageName = malloc(pageNameSize+6+1);
+    char *pageName = malloc(pageNameSize+18); // Allocate enough space for the requested name size, plus the "public" prefix and ".html" append
     strncpy(pageName,"public",7);
 
     // Append the page that was requested to the pageName string (direct "/" to "index.html")
