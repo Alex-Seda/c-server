@@ -6,6 +6,8 @@ struct HeaderFields decodeHeader(char* request){
     int i=0, current=0;
     char line[50];
 
+    // TODO: Adjust to loop against struct field length instead of hardcoded lengths
+
     // --- Get Request Type ---
     while(i<7){
         if(request[current] == ' '){

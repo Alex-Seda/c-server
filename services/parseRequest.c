@@ -40,13 +40,14 @@ char *parseRequest(char* request){
     /*
      * Find file name that corresponds to the requested page
      */
+    // TODO: Sanitize requested page input
     printf("\n\ninHeader Page: %s\n\n", inHeader.page);
     int pageNameSize = strlen(inHeader.page);
-    char *pageName = malloc(pageNameSize+1);
-    strncpy(pageName,"public",6);
+    char *pageName = malloc(pageNameSize+6+1);
+    strncpy(pageName,"public",7);
 
     // Append the page that was requested to the pageName string (direct "/" to "index.html")
-    if(pageNameSize == 1) strncat(pageName,"/index.html",11); // TODO: Improve this matching logic to only take "/"
+    if(pageNameSize == 1) strncat(pageName,"/index.html",12); // TODO: Improve this matching logic to only take "/"
     else{
         strncat(pageName,inHeader.page,pageNameSize);
         strncat(pageName,".html",6);
@@ -65,6 +66,7 @@ char *parseRequest(char* request){
         char* response = malloc(strlen(outHeader) + strlen(body) + 1);
         strcpy(response,outHeader);
         strncat(response,body,strlen(body));
+        free(pageName);
         return response;
     }
     else{
@@ -111,6 +113,7 @@ char *parseRequest(char* request){
         strncat(response, body, strlen(body));
 
         free(body); // Since we have copied body now, we can free the memory we allocated
+        free(pageName); // We can also free the pageName
 
         return response; // Return the full response
     }

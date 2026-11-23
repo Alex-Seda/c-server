@@ -124,6 +124,7 @@ int main(int argc, char const *argv[])
          *
          * On a real server, you would likely multithread this portion for concurrent request handling
          */
+        // TODO: Implement error handling for a bad accept value
         new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen);
 
         /*
